@@ -1,0 +1,22 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.194.3/containers/docker-existing-dockerfile
+{
+  "name": "kevin",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "../.",
+    "target": "dev"
+  },
+  "remoteUser": "gopher",
+  "workspaceFolder": "/home/gopher/src/kevin",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/gopher/src/kevin,type=bind,consistency=cached",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-azuretools.vscode-docker",
+        "vscode.makefile-tools"
+      ]
+    }
+  }
+}

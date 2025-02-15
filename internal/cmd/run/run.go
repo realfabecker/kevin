@@ -2,6 +2,7 @@ package run
 
 import (
 	"fmt"
+
 	"github.com/realfabecker/kevin/internal/adapters/logger"
 	"github.com/realfabecker/kevin/internal/adapters/render"
 	"github.com/realfabecker/kevin/internal/adapters/runner"
@@ -26,7 +27,7 @@ func newSubCmd(c domain.Cmd) *cobra.Command {
 				}
 			}
 
-			if len(args) != c.GetNofRequiredArgs() {
+			if c.GetNofRequiredArgs() > 0 && len(args) < c.GetNofRequiredArgs() {
 				return fmt.Errorf("you must supply at least %d arguments for this command", c.GetNofRequiredArgs())
 			}
 

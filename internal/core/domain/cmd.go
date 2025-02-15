@@ -20,12 +20,14 @@ type Flag struct {
 	Value    string `yaml:"value"`
 	Usage    string `yaml:"usage"`
 	Required bool   `yaml:"required"`
+	Default  string `yaml:"default"`
 }
 
 type Arg struct {
 	Name     string `yaml:"name"`
 	Value    string `yaml:"value"`
 	Required bool   `yaml:"required"`
+	Default  string `yaml:"default"`
 }
 
 func (c *Cmd) SetFlag(flag string, value string) {
@@ -40,6 +42,9 @@ func (c *Cmd) SetFlag(flag string, value string) {
 func (c *Cmd) GetFlag(flag string) string {
 	for _, f := range c.Flags {
 		if f.Name == flag {
+			if f.Value == "" {
+				return f.Default
+			}
 			return f.Value
 		}
 	}
@@ -58,6 +63,9 @@ func (c *Cmd) SetArg(arg string, value string) {
 func (c *Cmd) GetArg(arg string) string {
 	for _, a := range c.Args {
 		if a.Name == arg {
+			if a.Value == "" {
+				return a.Default
+			}
 			return a.Value
 		}
 	}

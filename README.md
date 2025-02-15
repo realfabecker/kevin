@@ -26,24 +26,29 @@ Here is an example of how to define and use a command with Kevin in the kevin.ym
 
 ```yaml
 commands:
-  - name: "create"
-    parent: "gpg"
-    short: "create a new gpg key"
-    args:
-      - name: kid
-        usage: "gpg key name"
+  - name: "ssh-key-gen"
+    short: "generates a new ssh key"
+    flags:
+      - name: "key"
+        short: "k"
         required: true
+      - name: "comment"
+        short: "c"
+        default: "my-key"
     cmd: |
-      echo 'Generating a new gpg key for {{ .GetArg "kid" }}'
-      config="Key-Type: 1\n"
-      config+="Key-Length: 2048\n"
-      config+="Subkey-Type: 1\n"
-      config+="Subkey-Length: 2048\n"
-      config+="Name-Real: $(echo {{ .GetArg "kid" }} | sed -E 's/(.*)@.*/\1/g')\n"
-      config+="Name-Email: {{ .GetArg "kid" }}\n"
-      config+="Expire-Date: $(date --iso-8601=s -d '+5weeks' | tr -d ':-' | cut -c 1-15)"
-      echo -e "$config" > /tmp/gpg-key.conf
-      gpg --batch --gen-key /tmp/gpg-key.conf        
+      key="$HOME/.ssh/{{ .GetFlag "key" }}.id_rsa"
+      if [[ -f $key ]]; then
+        echo "key $key already exists"
+        exit 1
+      fi;
+
+      ssh-keygen -t rsa \
+        -q \
+        -f "$key" \
+        -C {{ .GetFlag "comment"}} \
+        -N ""
+
+      ssh-add $key && cat "${key}.pub"      
 ```
 
 The kevin.yml configuration file can be stored globally in the user's home directory, or specifically by creating a file in the same directory as the invocation of the kevin command.
@@ -51,7 +56,7 @@ The kevin.yml configuration file can be stored globally in the user's home direc
 With this file ready, it will be possible to call the custom command as follows:
 
 ```bash
-kevin gpg create
+kevin ssh-key-gen -k nuvem
 ```
 
 ## Contributing
