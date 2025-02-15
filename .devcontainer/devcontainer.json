@@ -15,7 +15,8 @@
       "extensions": [
         "golang.go",
         "ms-azuretools.vscode-docker",
-        "vscode.makefile-tools"
+        "vscode.makefile-tools",
+        "ms-vscode.makefile-tools"
       ]
     }
   }

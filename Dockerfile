@@ -1,20 +1,17 @@
-FROM golang:1.24 AS base
+FROM golang:1.24.0-alpine3.21 AS base
 
-RUN mkdir -p /home/gopher \
-    && groupadd --gid 1000 gopher \
-    && useradd --uid 1000 --gid 1000 -m gopher \
-    && chown -R 1000:1000 /home/gopher
+RUN apk add --no-cache git make
+RUN addgroup -g 1000 -S gopher \
+    && adduser -D -G gopher -u 1000 gopher
 
 USER gopher
 ENV GOPATH="/home/gopher"
 ENV PATH="${GOPATH}/bin:${PATH}"
 
 FROM base AS dev
-RUN go install  "golang.org/x/tools/gopls@latest"
-RUN go install "github.com/tpng/gopkgs@latest"
-RUN go install "github.com/ramya-rao-a/go-outline@latest"
-RUN go install "honnef.co/go/tools/cmd/staticcheck@latest"
-RUN go install "github.com/go-delve/delve/cmd/dlv@latest"
+RUN GODEBUG=http2client=0,netdns=go+1m GOPROXY=https://proxy.golang.org,direct go install "golang.org/x/tools/gopls@latest"
+RUN GODEBUG=http2client=0,netdns=go+1m GOPROXY=https://proxy.golang.org,direct go install "honnef.co/go/tools/cmd/staticcheck@latest"
+RUN GODEBUG=http2client=0,netdns=go+1m GOPROXY=https://proxy.golang.org,direct go install "github.com/go-delve/delve/cmd/dlv@latest"
 WORKDIR /app
 COPY go.mod .
 COPY go.sum .

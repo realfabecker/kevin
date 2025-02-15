@@ -3,14 +3,38 @@
     "[go]": {
         "editor.defaultFormatter": "golang.go"
     },
+    "gopls": {
+        "ui.semanticTokens": true
+    },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.defaultProfile.linux": "sh",
     "terminal.integrated.profiles.linux": {
+        "sh": {
+            "path": "sh",
+            "icon": "terminal"
+        },
         "bash": {
             "path": "bash",
             "icon": "terminal-bash"
-        },
-    }
+        }
+    },
+    "makefile.configurations": [
+        {
+            "name": "Default",
+            "makeArgs": [
+                "--version"
+            ]
+        }
+    ],
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "binaryPath": "out/kevin"
+        }
+    ],
+    "makefile.makefilePath": "Makefile",
+    "makefile.configureOnOpen": false,
+    "makefile.buildLog": "build.log",
 }
