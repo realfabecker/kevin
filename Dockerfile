@@ -1,4 +1,4 @@
-FROM golang:1.23 AS base
+FROM golang:1.24 AS base
 
 RUN mkdir -p /home/gopher \
     && groupadd --gid 1000 gopher \
@@ -15,7 +15,6 @@ RUN go install "github.com/tpng/gopkgs@latest"
 RUN go install "github.com/ramya-rao-a/go-outline@latest"
 RUN go install "honnef.co/go/tools/cmd/staticcheck@latest"
 RUN go install "github.com/go-delve/delve/cmd/dlv@latest"
-RUN go install "github.com/swaggo/swag/cmd/swag@latest"
 WORKDIR /app
 COPY go.mod .
 COPY go.sum .
