@@ -5,6 +5,8 @@
 Kevin is a dynamic command creation tool that allows you to define and execute commands based on a configuration file.
 It is designed to simplify the process of running complex scripts and commands.
 
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=realfabecker_kevin&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=realfabecker_kevin)
+
 ## Features
 
 - Dynamic command creation
