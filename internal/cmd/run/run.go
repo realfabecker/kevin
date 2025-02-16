@@ -12,31 +12,33 @@ import (
 
 var DryRun bool
 
+func subCmdRunE(c domain.Cmd) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		for _, f := range c.Flags {
+			v, _ := cmd.Flags().GetString(f.Name)
+			c.SetFlag(f.Name, v)
+		}
+		if len(args) > 0 && len(args) == len(c.Args) {
+			for i, a := range args {
+				c.Args[i].Value = a
+			}
+		}
+		if c.GetNofRequiredArgs() > 0 && len(args) < c.GetNofRequiredArgs() {
+			return fmt.Errorf("you must supply at least %d arguments for this command", c.GetNofRequiredArgs())
+		}
+		rn := runner.New(runner.NewCliOpts{
+			Logger: logger.NewConsoleLogger(),
+			Render: render.NewScriptRender(),
+		})
+		return rn.Run(&c, DryRun)
+	}
+}
+
 func newSubCmd(c domain.Cmd) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   c.Name,
 		Short: c.Short,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			for _, f := range c.Flags {
-				v, _ := cmd.Flags().GetString(f.Name)
-				c.SetFlag(f.Name, v)
-			}
-			if len(args) > 0 && len(args) == len(c.Args) {
-				for i, a := range args {
-					c.Args[i].Value = a
-				}
-			}
-
-			if c.GetNofRequiredArgs() > 0 && len(args) < c.GetNofRequiredArgs() {
-				return fmt.Errorf("you must supply at least %d arguments for this command", c.GetNofRequiredArgs())
-			}
-
-			rn := runner.New(runner.NewCliOpts{
-				Logger: logger.NewConsoleLogger(),
-				Render: render.NewScriptRender(),
-			})
-			return rn.Run(&c, DryRun)
-		},
+		RunE:  subCmdRunE(c),
 	}
 	for _, f := range c.Flags {
 		if f.Short == "" {
@@ -63,23 +65,9 @@ func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
 				root.AddCommand(groupCmd)
 			} else {
 				xmd := newSubCmd(c)
-				if c.Parent != "" {
-					if _, ok := m[c.Parent]; ok {
-						m[c.Parent].RunE = nil
-						m[c.Parent].AddCommand(xmd)
-					} else {
-						m[c.Parent] = &cobra.Command{
-							Use: c.Parent,
-						}
-						m[c.Parent].AddCommand(xmd)
-						root.AddCommand(m[c.Parent])
-					}
-				} else {
-					root.AddCommand(xmd)
-				}
+				root.AddCommand(xmd)
 				m[c.Name] = xmd
 			}
-
 		}(v)
 	}
 	root.PersistentFlags().BoolVarP(&DryRun, "dry-run", "d", false, "run in dry run mode")

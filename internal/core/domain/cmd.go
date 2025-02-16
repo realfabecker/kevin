@@ -3,15 +3,14 @@ package domain
 import "os"
 
 type Cmd struct {
-	Name   string `yaml:"name"`
-	Parent string `yaml:"parent"`
-	Short  string `yaml:"short"`
-	Cmd    string `yaml:"cmd"`
-	Flags  []Flag `yaml:"flags"`
-	Args   []Arg  `yaml:"args"`
-	Lang   string `yaml:"lang"`
-	Ref    string `yaml:"ref"`
-	Pipe   []Cmd
+	Name  string `yaml:"name"`
+	Short string `yaml:"short"`
+	Cmd   string `yaml:"cmd"`
+	Flags []Flag `yaml:"flags"`
+	Args  []Arg  `yaml:"args"`
+	Lang  string `yaml:"lang"`
+	Ref   string `yaml:"ref"`
+	Pipe  []Cmd
 }
 
 type Flag struct {

@@ -7,7 +7,7 @@
     "context": "../.",
     "target": "dev"
   },
-  "remoteUser": "gopher",
+  "remoteUser": "nonroot",
   "workspaceFolder": "/home/gopher/src/kevin",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/gopher/src/kevin,type=bind,consistency=cached",
   "customizations": {
@@ -16,7 +16,9 @@
         "golang.go",
         "ms-azuretools.vscode-docker",
         "vscode.makefile-tools",
-        "ms-vscode.makefile-tools"
+        "ms-vscode.makefile-tools",
+        "github.vscode-github-actions",
+        "sonarsource.sonarlint-vscode"
       ]
     }
   }
