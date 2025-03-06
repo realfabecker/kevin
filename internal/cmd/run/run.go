@@ -53,6 +53,16 @@ func newSubCmd(c domain.Cmd) *cobra.Command {
 	return cmd
 }
 
+func pushUnqCmd(root *cobra.Command, cmd *cobra.Command) {
+	for _, v := range root.Commands() {
+		if v.Name() == cmd.Name() {
+			root.RemoveCommand(v)
+			break
+		}
+	}
+	root.AddCommand(cmd)
+}
+
 func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
 	for _, v := range cmds {
 		func(c domain.Cmd) {
@@ -62,9 +72,9 @@ func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
 					Short: c.Short,
 				}
 				AttachCmd(groupCmd, c.Commands)
-				root.AddCommand(groupCmd)
+				pushUnqCmd(root, groupCmd)
 			} else {
-				root.AddCommand(newSubCmd(c))
+				pushUnqCmd(root, newSubCmd(c))
 			}
 		}(v)
 	}
