@@ -42,9 +42,10 @@ func newSubCmd(c domain.Cmd) *cobra.Command {
 	}
 	for _, f := range c.Flags {
 		if f.Short == "" {
-			f.Short = f.Name[:1]
+			cmd.Flags().String(f.Name, f.Value, f.Usage)
+		} else {
+			cmd.Flags().StringP(f.Name, f.Short, f.Value, f.Usage)
 		}
-		cmd.Flags().StringP(f.Name, f.Short, f.Value, f.Usage)
 		if f.Required {
 			_ = cmd.MarkFlagRequired(f.Name)
 		}
@@ -67,5 +68,5 @@ func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
 			}
 		}(v)
 	}
-	root.PersistentFlags().BoolVarP(&DryRun, "dry-run", "d", false, "run in dry run mode")
+	root.PersistentFlags().BoolVar(&DryRun, "dry-run", false, "run in dry run mode")
 }
