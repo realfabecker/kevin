@@ -3,11 +3,12 @@ package kevin
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/realfabecker/kevin/internal/core/domain"
 	"github.com/realfabecker/kevin/internal/core/ports"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
 )
 
 type YmlCommandRepository struct {
@@ -86,7 +87,7 @@ func (m YmlCommandRepository) source(rf string) ([]domain.Cmd, error) {
 			rp = filepath.Join(filepath.Dir(rf), rp)
 		}
 
-		if src.Commands[i].Pipe, err = m.source(rp); err != nil {
+		if src.Commands[i].Commands, err = m.source(rp); err != nil {
 			return nil, err
 		}
 	}

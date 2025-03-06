@@ -28,38 +28,39 @@ Here is an example of how to define and use a command with Kevin in the kevin.ym
 
 ```yaml
 commands:
-  - name: "ssh-key-gen"
-    short: "generates a new ssh key"
-    flags:
-      - name: "key"
-        short: "k"
-        required: true
-      - name: "comment"
-        short: "c"
-        default: "my-key"
+  - name: "hello"
+    short: "Say hello"
     cmd: |
-      key="$HOME/.ssh/{{ .GetFlag "key" }}.id_rsa"
-      if [[ -f $key ]]; then
-        echo "key $key already exists"
-        exit 1
-      fi;
+      echo "Hello friend!"
 
-      ssh-keygen -t rsa \
-        -q \
-        -f "$key" \
-        -C {{ .GetFlag "comment"}} \
-        -N ""
+  - name: "greeter"
+    short: "greets the user"
+    commands:
+      - name: "morning"
+        short: "Say good morning"
+        cmd: |
+          echo "Good morning"
 
-      ssh-add $key && cat "${key}.pub"      
+      - name: "afternoon"
+        short: "Say good good afternoon"
+        cmd: |
+          echo "Good afternoon"   
 ```
 
 The kevin.yml configuration file can be stored globally in the user's home directory, or specifically by creating a file in the same directory as the invocation of the kevin command.
 
-With this file ready, it will be possible to call the custom command as follows:
+With the file ready, it will be possible to call a custom command as follows:
 
 ```bash
-kevin ssh-key-gen -k nuvem
+kevin hello
 ```
+
+Or a custom sub command
+
+```bash
+kevin greeter morning
+```
+
 
 ## Contributing
 

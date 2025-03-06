@@ -52,39 +52,18 @@ func newSubCmd(c domain.Cmd) *cobra.Command {
 	return cmd
 }
 
-func attchParent(c domain.Cmd, root *cobra.Command, m map[string]*cobra.Command) {
-	xmd := newSubCmd(c)
-	if c.Parent != "" {
-		if _, ok := m[c.Parent]; ok {
-			m[c.Parent].RunE = nil
-			m[c.Parent].AddCommand(xmd)
-		} else {
-			m[c.Parent] = &cobra.Command{
-				Use: c.Parent,
-			}
-			m[c.Parent].AddCommand(xmd)
-			root.AddCommand(m[c.Parent])
-		}
-	} else {
-		root.AddCommand(xmd)
-	}
-	root.AddCommand(xmd)
-	m[c.Name] = xmd
-}
-
 func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
-	var m = make(map[string]*cobra.Command)
 	for _, v := range cmds {
 		func(c domain.Cmd) {
-			if c.Pipe != nil {
+			if c.Commands != nil {
 				groupCmd := &cobra.Command{
 					Use:   c.Name,
 					Short: c.Short,
 				}
-				AttachCmd(groupCmd, c.Pipe)
+				AttachCmd(groupCmd, c.Commands)
 				root.AddCommand(groupCmd)
 			} else {
-				attchParent(c, root, m)
+				root.AddCommand(newSubCmd(c))
 			}
 		}(v)
 	}
