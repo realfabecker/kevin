@@ -24,7 +24,7 @@ check_profile_config() {
 
   Please, include the following lines to your profile configuration
 
-  export $p:$install_dir
+  export PATH=\$PATH:$install_dir
 
 EOF
   fi
