@@ -1,77 +1,63 @@
 # kevin
 
-## Introduction
+## Introdução
 
-Kevin is a dynamic command creation tool that allows you to define and execute commands based on a configuration file.
-It is designed to simplify the process of running complex scripts and commands.
+Kevin é uma ferramenta dinâmica de criação de comandos que permite definir e executar comandos com base em um arquivo de configuração. Ela foi projetada para simplificar o processo de execução de scripts e comandos complexos.
 
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=realfabecker_kevin&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=realfabecker_kevin)
 
 ## Features
 
-- Dynamic command creation
-- Configuration via `kevin.yml`
-- Support for flags and arguments
-- Easy integration with shell scripts
+- Criação dinâmica de comandos
+- Configuração via arquivo `kevin.yml`
+- Suporte a flags e argumentos
+- Integração fácil com shell scripts
 
-## Installation
+## Instalação
 
-You can install or update Kevin using the installation script:
+Você pode instalar ou atualizar o Kevin usando seu script de instalação:
 
 ```bash
 curl -so- https://raw.githubusercontent.com/realfabecker/kevin/master/install.sh | bash
 ```
 
-## Usage
+## Usando
 
-Here is an example of how to define and use a command with Kevin in the kevin.yml file:
+Aqui um exemplo de como definir e usar um comando com o Kevin no seu arquivo kevin.yml:
 
 ```yaml
 commands:
-  - name: "hello"
-    short: "Say hello"
-    cmd: |
-      echo "Hello friend!"
-
-  - name: "greeter"
-    short: "greets the user"
-    commands:
-      - name: "morning"
-        short: "Say good morning"
-        cmd: |
-          echo "Good morning"
-
-      - name: "afternoon"
-        short: "Say good good afternoon"
-        cmd: |
-          echo "Good afternoon"   
+  - name: "pg-restore"
+    short: "Inicializa um projeto a partir de um repositório git"
+    flags:
+      - name: "database"
+        required: true
+      - name: "backup"
+        required: true
+    cmd: |      
+      pg_restore -h localhost -p 5432 -U postgres -d {{ .GetFlag "database" }} -v  {{ .GetFlag "backup" }}
 ```
 
-The kevin.yml configuration file can be stored globally in the user's home directory, or specifically by creating a file in the same directory as the invocation of the kevin command.
+O arquivo de configuração kevin.yml pode ser armazenado globalmente no diretório do usuário, ou por criando um arquivo no mesmo diretório em que o comando kevin é invocado.n command.
 
-With the file ready, it will be possible to call a custom command as follows:
+Com o arquivo pronto, será possível chamar o comando personalizado da seguinte forma:
 
 ```bash
-kevin hello
+kevin pg-restore --database app --backup ./backup.sql
 ```
 
-Or a custom sub command
+## Contribuindo
 
-```bash
-kevin greeter morning
-```
+Você gostaria de contribuir para o projeto? Confira nosso [guia][link-contrib] para saber como contribuir.
 
+## Versionamento
 
-## Contributing
+O versionamento desse projeto é baseado no [SemVer](https://semver.org/). Verifique as [tags do projeto][link-tags] para informações sobre as versões disponíveis.
 
-We welcome contributions! Please refer to the [contribution guide](./docs/CONTRIBUTING.md) for details on how to
-contribute to the project.
+## Licença
 
-## Versioning
+Este projeto está sob a licença MIT. Confira os detalhes no arquivo [Lincença][link-license]
 
-This project uses [SemVer](https://semver.org/) for versioning. For all available versions, check the
-[tags in this repository](https://github.com/realfabecker/kevin/tags).
-
-## Licence
-
-This project is licensed under the MIT License. See the [License](LICENSE.md) for more information.
+[link-tags]: https://github.com/realfabecker/kevin/tags
+[link-license]: https://github.com/realfabecker/.github/blob/main/.github/LICENSE.md
+[link-contrib]: https://github.com/realfabecker/.github/blob/main/.github/CONTRIBUTING.md
