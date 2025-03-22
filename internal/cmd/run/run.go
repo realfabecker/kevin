@@ -35,6 +35,10 @@ func subCmdRunE(c domain.Cmd) func(cmd *cobra.Command, args []string) error {
 }
 
 func newSubCmd(c domain.Cmd) *cobra.Command {
+	render := render.NewScriptRender()
+	if va, _ := render.Render(&c, c.Short); va != "" {
+		c.Short = va
+	}
 	cmd := &cobra.Command{
 		Use:   c.Name,
 		Short: c.Short,
@@ -63,18 +67,33 @@ func pushUnqCmd(root *cobra.Command, cmd *cobra.Command) {
 	root.AddCommand(cmd)
 }
 
+func pushMatrixCmd(c domain.Cmd, root *cobra.Command) {
+	if c.Matrix != nil && len(c.Matrix.Name) > 0 {
+		for _, v := range c.Matrix.Name {
+			c.Name = v
+			pushUnqCmd(root, newSubCmd(c))
+		}
+	} else {
+		pushUnqCmd(root, newSubCmd(c))
+	}
+}
+
+func pushGroupCmd(c domain.Cmd, root *cobra.Command) {
+	groupCmd := &cobra.Command{
+		Use:   c.Name,
+		Short: c.Short,
+	}
+	AttachCmd(groupCmd, c.Commands)
+	pushUnqCmd(root, groupCmd)
+}
+
 func AttachCmd(root *cobra.Command, cmds []domain.Cmd) {
 	for _, v := range cmds {
 		func(c domain.Cmd) {
 			if c.Commands != nil {
-				groupCmd := &cobra.Command{
-					Use:   c.Name,
-					Short: c.Short,
-				}
-				AttachCmd(groupCmd, c.Commands)
-				pushUnqCmd(root, groupCmd)
+				pushGroupCmd(c, root)
 			} else {
-				pushUnqCmd(root, newSubCmd(c))
+				pushMatrixCmd(c, root)
 			}
 		}(v)
 	}

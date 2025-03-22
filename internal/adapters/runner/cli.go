@@ -3,12 +3,13 @@ package runner
 import (
 	"bytes"
 	"fmt"
-	"github.com/realfabecker/kevin/internal/core/domain"
-	"github.com/realfabecker/kevin/internal/core/ports"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/realfabecker/kevin/internal/core/domain"
+	"github.com/realfabecker/kevin/internal/core/ports"
 )
 
 type Cli struct {
@@ -38,7 +39,7 @@ func New(opts NewCliOpts) *Cli {
 }
 
 func (c *Cli) Run(cmd *domain.Cmd, dryRun bool) error {
-	script, err := c.Render.Render(cmd)
+	script, err := c.Render.Render(cmd, cmd.Cmd)
 	if err != nil {
 		return fmt.Errorf("unable to run command: %w", err)
 	}

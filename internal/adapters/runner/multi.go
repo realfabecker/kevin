@@ -2,13 +2,14 @@ package runner
 
 import (
 	"fmt"
-	"github.com/realfabecker/kevin/internal/core/ports"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/realfabecker/kevin/internal/core/ports"
 )
 
 type multi struct{}
@@ -20,7 +21,6 @@ func NewMulti() ports.ParallelRunner {
 func (m *multi) Run(command string, pll int, mFlags []map[string]string) {
 	start := time.Now()
 
-	fmt.Println("Running", pll, "commands in parallel")
 	if len(mFlags) > 0 {
 		m.runParallelWithFlags(command, pll, mFlags)
 	} else {

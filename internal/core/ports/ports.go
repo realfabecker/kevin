@@ -30,5 +30,5 @@ type FlagListReader interface {
 }
 
 type ScriptRender interface {
-	Render(cmd *domain.Cmd) (string, error)
+	Render(cmd *domain.Cmd, tmpl string) (string, error)
 }

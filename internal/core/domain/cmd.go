@@ -3,14 +3,19 @@ package domain
 import "os"
 
 type Cmd struct {
-	Name     string `yaml:"name"`
-	Short    string `yaml:"short"`
-	Cmd      string `yaml:"cmd"`
-	Flags    []Flag `yaml:"flags"`
-	Args     []Arg  `yaml:"args"`
-	Lang     string `yaml:"lang"`
-	Ref      string `yaml:"ref"`
-	Commands []Cmd  `yaml:"commands"`
+	Name     string  `yaml:"name"`
+	Short    string  `yaml:"short"`
+	Cmd      string  `yaml:"cmd"`
+	Flags    []Flag  `yaml:"flags"`
+	Args     []Arg   `yaml:"args"`
+	Lang     string  `yaml:"lang"`
+	Ref      string  `yaml:"ref"`
+	Commands []Cmd   `yaml:"commands"`
+	Matrix   *Matrix `yaml:"matrix"`
+}
+
+type Matrix struct {
+	Name []string `yaml:"name"`
 }
 
 type Flag struct {
