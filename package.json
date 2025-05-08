@@ -1,0 +1,35 @@
+{
+  "name": "@sintese/kevin",
+  "version": "0.9.2",
+  "description": "Definição de comandos a partir de arquivo de configuração",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "postinstall": "go-npm install",
+    "preuninstall": "go-npm uninstall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/realfabecker/kevin.git"
+  },
+  "keywords": [
+    "cli"
+  ],
+  "author": "Rafael Becker",
+  "license": "MIT",
+  "homepage": "https://github.com/realfabecker/kevin#readme",
+  "dependencies": {
+    "go-npm": "^0.1.9"
+  },
+  "files": [
+    "LICENSE.md",
+    "README.md"
+  ],
+  "goBinary": {
+    "name": "kevin",
+    "path": "./bin",
+    "url": "https://github.com/realfabecker/kevin/releases/download/{{version}}/kevin-{{version}}-{{platform}}-{{arch}}.tar.gz"
+  }
+}

@@ -21,6 +21,12 @@ Você pode instalar ou atualizar o Kevin usando seu script de instalação:
 curl -so- https://raw.githubusercontent.com/realfabecker/kevin/master/install.sh | bash
 ```
 
+Ou também a partir da distribuição disponibilizada por meio do npm:
+
+```
+npm install -g @sintese/kevin
+```
+
 ## Usando
 
 Aqui um exemplo de como definir e usar um comando com o Kevin no seu arquivo kevin.yml:
@@ -34,7 +40,7 @@ commands:
         required: true
       - name: "backup"
         required: true
-    cmd: |      
+    cmd: |
       pg_restore -h localhost -p 5432 -U postgres -d {{ .GetFlag "database" }} -v  {{ .GetFlag "backup" }}
 ```
 
