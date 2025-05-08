@@ -6,6 +6,9 @@
   "directories": {
     "doc": "docs"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "postinstall": "go-npm install",
     "preuninstall": "go-npm uninstall"
