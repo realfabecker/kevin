@@ -15,13 +15,7 @@ Kevin é uma ferramenta dinâmica de criação de comandos que permite definir e
 
 ## Instalação
 
-Você pode instalar ou atualizar o Kevin usando seu script de instalação:
-
-```bash
-curl -so- https://raw.githubusercontent.com/realfabecker/kevin/master/install.sh | bash
-```
-
-Ou também a partir da distribuição disponibilizada por meio do npm:
+Você pode obter o Kevin a partir da sua distribuição pelo npm
 
 ```
 npm install -g @sintese/kevin
