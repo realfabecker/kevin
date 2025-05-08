@@ -28,14 +28,15 @@ Aqui um exemplo de como definir e usar um comando com o Kevin no seu arquivo kev
 ```yaml
 commands:
   - name: "pg-restore"
-    short: "Inicializa um projeto a partir de um repositório git"
+    short: "Restaura um banco de dados a partir de um arquivo de backup"
     flags:
       - name: "database"
         required: true
       - name: "backup"
         required: true
     cmd: |
-      pg_restore -h localhost -p 5432 -U postgres -d {{ .GetFlag "database" }} -v  {{ .GetFlag "backup" }}
+      pg_restore -h localhost -p 5432 -U postgres \
+            --database {{ .GetFlag "database" }} --backup  {{ .GetFlag "backup" }}
 ```
 
 O arquivo de configuração kevin.yml pode ser armazenado globalmente no diretório do usuário, ou por criando um arquivo no mesmo diretório em que o comando kevin é invocado.n command.
