@@ -39,6 +39,12 @@ func New(opts NewCliOpts) *Cli {
 }
 
 func (c *Cli) Run(cmd *domain.Cmd, dryRun bool) error {
+	if wd, err := os.Getwd(); err != nil {
+		return fmt.Errorf("unable to run command: %w", err)
+	} else {
+		cmd.SetWd(wd)
+	}
+
 	script, err := c.Render.Render(cmd, cmd.Cmd)
 	if err != nil {
 		return fmt.Errorf("unable to run command: %w", err)

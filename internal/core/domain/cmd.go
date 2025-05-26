@@ -12,6 +12,7 @@ type Cmd struct {
 	Ref      string  `yaml:"ref"`
 	Commands []Cmd   `yaml:"commands"`
 	Matrix   *Matrix `yaml:"matrix"`
+	Workdir  string
 }
 
 type Matrix struct {
@@ -88,4 +89,12 @@ func (c *Cmd) GetNofRequiredArgs() int {
 
 func (c *Cmd) GetEnv(env string) string {
 	return os.Getenv(env)
+}
+
+func (c *Cmd) SetWd(wd string) {
+	c.Workdir = wd
+}
+
+func (c *Cmd) GetWd() string {
+	return c.Workdir
 }
