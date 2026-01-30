@@ -16,11 +16,15 @@ func subCmdRunE(c domain.Cmd) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		for _, f := range c.Flags {
 			v, _ := cmd.Flags().GetString(f.Name)
-			c.SetFlag(f.Name, v)
+			if err := c.SetFlag(f.Name, v); err != nil {
+				return err
+			}
 		}
 		if len(args) > 0 && len(args) == len(c.Args) {
 			for i, a := range args {
-				c.Args[i].Value = a
+				if err := c.SetArg(i, a); err != nil {
+					return err
+				}
 			}
 		}
 		if c.GetNofRequiredArgs() > 0 && len(args) < c.GetNofRequiredArgs() {

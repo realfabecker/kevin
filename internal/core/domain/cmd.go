@@ -1,6 +1,11 @@
 package domain
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"slices"
+	"strings"
+)
 
 type Cmd struct {
 	Name     string  `yaml:"name"`
@@ -20,28 +25,34 @@ type Matrix struct {
 }
 
 type Flag struct {
-	Name     string `yaml:"name"`
-	Short    string `yaml:"short"`
-	Value    string `yaml:"value"`
-	Usage    string `yaml:"usage"`
-	Required bool   `yaml:"required"`
-	Default  string `yaml:"default"`
+	Name     string   `yaml:"name"`
+	Short    string   `yaml:"short"`
+	Value    string   `yaml:"value"`
+	Usage    string   `yaml:"usage"`
+	Required bool     `yaml:"required"`
+	Default  string   `yaml:"default"`
+	Enum     []string `yaml:"enum"`
 }
 
 type Arg struct {
-	Name     string `yaml:"name"`
-	Value    string `yaml:"value"`
-	Required bool   `yaml:"required"`
-	Default  string `yaml:"default"`
+	Name     string   `yaml:"name"`
+	Value    string   `yaml:"value"`
+	Required bool     `yaml:"required"`
+	Default  string   `yaml:"default"`
+	Enum     []string `yaml:"enum"`
 }
 
-func (c *Cmd) SetFlag(flag string, value string) {
+func (c *Cmd) SetFlag(flag string, value string) error {
 	for i, f := range c.Flags {
 		if f.Name == flag {
+			if len(f.Enum) > 0 && !slices.Contains(f.Enum, value) {
+				return fmt.Errorf("value for flag %s not in the enumeration: %s", flag, strings.Join(f.Enum, ","))
+			}
 			c.Flags[i].Value = value
 			break
 		}
 	}
+	return nil
 }
 
 func (c *Cmd) GetFlag(flag string) string {
@@ -56,13 +67,17 @@ func (c *Cmd) GetFlag(flag string) string {
 	return ""
 }
 
-func (c *Cmd) SetArg(arg string, value string) {
+func (c *Cmd) SetArg(arg int, value string) error {
 	for i, a := range c.Args {
-		if a.Name == arg {
+		if i == arg {
+			if len(a.Enum) > 0 && !slices.Contains(a.Enum, value) {
+				return fmt.Errorf("value for arg %s not in the enumeration: %s", a.Name, strings.Join(a.Enum, ","))
+			}
 			c.Args[i].Value = value
 			break
 		}
 	}
+	return nil
 }
 
 func (c *Cmd) GetArg(arg string) string {
