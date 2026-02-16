@@ -3,6 +3,7 @@ package pll
 import (
 	"github.com/realfabecker/kevin/internal/adapters/flagreader"
 	"github.com/realfabecker/kevin/internal/adapters/runner"
+	"github.com/realfabecker/kevin/internal/core/domain"
 	"github.com/spf13/cobra"
 )
 
@@ -11,6 +12,7 @@ func NewRunCmd() *cobra.Command {
 		Workers int
 		File    string
 		Command string
+		LogType string
 	}{}
 
 	cmd := &cobra.Command{
@@ -26,13 +28,14 @@ func NewRunCmd() *cobra.Command {
 					flags = mFlags
 				}
 			}
-			runner.NewMulti().Run(f.Command, f.Workers, flags)
+			runner.NewMulti().Run(f.Command, f.Workers, flags, domain.ParseLogType(f.LogType))
 			return nil
 		},
 	}
 	cmd.Flags().IntVarP(&f.Workers, "w", "w", 1, "number of concurrent workers")
 	cmd.Flags().StringVarP(&f.Command, "c", "c", "", "command to be executed")
 	cmd.Flags().StringVarP(&f.File, "f", "f", "", "path to csv file with flags")
+	cmd.Flags().StringVarP(&f.LogType, "l", "l", string(domain.LogScript), "log strategy")
 	_ = cmd.MarkFlagRequired("c")
 	return cmd
 }

@@ -22,7 +22,7 @@ type CommandRepository interface {
 }
 
 type ParallelRunner interface {
-	Run(command string, pll int, mFlags []map[string]string)
+	Run(command string, pll int, mFlags []map[string]string, log domain.LogType)
 }
 
 type FlagListReader interface {
