@@ -44,8 +44,8 @@ func (m *multi) runParallel(command string, pll int, log domain.LogType) {
 		go func(l domain.LogType) {
 			defer wg.Done()
 			ch <- struct{}{}
-			if err := m.runCmd(command, nil, l); err != nil {
-				fmt.Println(fmt.Errorf("runPll: %w", err))
+			if status, err := m.runCmd(command, nil, l); err != nil {
+				fmt.Println(fmt.Errorf("Err: (status: %d) %w", status, err))
 			}
 			<-ch
 		}(log)
@@ -67,18 +67,18 @@ func (m *multi) runParallelWithFlags(command string, pll int, mFlags []map[strin
 			defer wg.Done()
 			ch <- struct{}{}
 
-			current := atomic.AddInt64(&counter, 1)
-
-			if l == domain.LogTool {
-				if fgs, _ := json.Marshal(flags); fgs != nil {
-					fmt.Printf("Script: %d of %d - %s\n", current, len(mFlags), string(fgs))
-				} else {
-					fmt.Printf("Script: %d of %d\n", current, len(mFlags))
-				}
+			c, err := m.runCmd(command, flags, l)
+			if err != nil {
+				fmt.Println(fmt.Errorf("Err: (status: %d) %w", c, err))
 			}
 
-			if err := m.runCmd(command, flags, l); err != nil {
-				fmt.Println(fmt.Errorf("runPll: %w", err))
+			if l == domain.LogTool {
+				current := atomic.AddInt64(&counter, 1)
+				if fgs, _ := json.Marshal(flags); fgs != nil {
+					fmt.Printf("Script: %d of %d (status: %d) - %s\n", current, len(mFlags), c, string(fgs))
+				} else {
+					fmt.Printf("Script: %d of %d (status: %d)\n", current, len(mFlags), c)
+				}
 			}
 
 			<-ch
@@ -87,7 +87,7 @@ func (m *multi) runParallelWithFlags(command string, pll int, mFlags []map[strin
 	wg.Wait()
 }
 
-func (m *multi) runCmd(command string, flags map[string]string, log domain.LogType) error {
+func (m *multi) runCmd(command string, flags map[string]string, log domain.LogType) (int, error) {
 	act := strings.Split(command, " ")
 	if len(flags) > 0 {
 		for k, v := range flags {
@@ -105,5 +105,11 @@ func (m *multi) runCmd(command string, flags map[string]string, log domain.LogTy
 		cmd.Stderr = os.Stderr
 	}
 	cmd.Stdin = os.Stdin
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		if e, ok := err.(*exec.ExitError); ok {
+			return e.ExitCode(), err
+		}
+		return 1, err
+	}
+	return 0, nil
 }
