@@ -20,7 +20,11 @@ func subCmdRunE(c domain.Cmd) func(cmd *cobra.Command, args []string) error {
 				return err
 			}
 		}
-		if len(args) > 0 && len(args) == len(c.Args) {
+		if c.Type == "proxy" && len(args) > 0 {
+			for x, y := range args {
+				c.AddArg(fmt.Sprintf("arg_%d", x), y)
+			}
+		} else if len(args) > 0 && len(args) == len(c.Args) {
 			for i, a := range args {
 				if err := c.SetArg(i, a); err != nil {
 					return err

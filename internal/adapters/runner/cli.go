@@ -39,6 +39,10 @@ func New(opts NewCliOpts) *Cli {
 }
 
 func (c *Cli) Run(cmd *domain.Cmd, dryRun bool) error {
+	if cmd.Type == "proxy" {
+		return c.proxy(cmd)
+	}
+
 	if wd, err := os.Getwd(); err != nil {
 		return fmt.Errorf("unable to run command: %w", err)
 	} else {
@@ -91,6 +95,21 @@ func (c *Cli) Run(cmd *domain.Cmd, dryRun bool) error {
 	}
 	return fmt.Errorf("unsupported runtime: %s", runtime.GOOS)
 
+}
+
+func (c *Cli) proxy(cmd *domain.Cmd) error {
+	if cmd.Name != "git" {
+		return fmt.Errorf("proxy only supports git")
+	}
+	act := []string{"-C", cmd.Workdir}
+	for _, x := range cmd.Args {
+		act = append(act, x.Value)
+	}
+	return c.runE(CliRunOpts{
+		Command:   "git",
+		Attach:    true,
+		Arguments: act,
+	})
 }
 
 func (c *Cli) runB(opts CliRunOpts) ([]byte, error) {

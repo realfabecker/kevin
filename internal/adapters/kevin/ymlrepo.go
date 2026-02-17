@@ -90,6 +90,17 @@ func (m YmlCommandRepository) source(rf string) ([]domain.Cmd, error) {
 		if src.Commands[i].Commands, err = m.source(rp); err != nil {
 			return nil, err
 		}
+
+		if v.Proxy != nil {
+			for _, y := range v.Proxy {
+				src.Commands[i].Commands = append(src.Commands[i].Commands, domain.Cmd{
+					Name:    y,
+					Short:   v.Name + " " + y + " proxy",
+					Type:    "proxy",
+					Workdir: filepath.Dir(rp),
+				})
+			}
+		}
 	}
 	return src.Commands, nil
 }

@@ -8,16 +8,18 @@ import (
 )
 
 type Cmd struct {
-	Name     string  `yaml:"name"`
-	Short    string  `yaml:"short"`
-	Cmd      string  `yaml:"cmd"`
-	Flags    []Flag  `yaml:"flags"`
-	Args     []Arg   `yaml:"args"`
-	Lang     string  `yaml:"lang"`
-	Ref      string  `yaml:"ref"`
-	Commands []Cmd   `yaml:"commands"`
-	Matrix   *Matrix `yaml:"matrix"`
+	Name     string   `yaml:"name"`
+	Short    string   `yaml:"short"`
+	Cmd      string   `yaml:"cmd"`
+	Flags    []Flag   `yaml:"flags"`
+	Args     []Arg    `yaml:"args"`
+	Lang     string   `yaml:"lang"`
+	Ref      string   `yaml:"ref"`
+	Commands []Cmd    `yaml:"commands"`
+	Proxy    []string `yaml:"proxy"`
+	Matrix   *Matrix  `yaml:"matrix"`
 	Workdir  string
+	Type     string
 }
 
 type Matrix struct {
@@ -78,6 +80,13 @@ func (c *Cmd) SetArg(arg int, value string) error {
 		}
 	}
 	return nil
+}
+
+func (c *Cmd) AddArg(name string, value string) {
+	c.Args = append(c.Args, Arg{
+		Name:  name,
+		Value: value,
+	})
 }
 
 func (c *Cmd) GetArg(arg string) string {
