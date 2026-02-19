@@ -78,29 +78,51 @@ func (m YmlCommandRepository) source(rf string) ([]domain.Cmd, error) {
 		return nil, fmt.Errorf("list: %w", err)
 	}
 	for i, v := range src.Commands {
-		if v.Ref == "" {
-			continue
-		}
+		src.Commands[i].SetFileDir(filepath.Dir(rf))
 
-		rp := v.Ref
-		if !filepath.IsAbs(v.Ref) {
-			rp = filepath.Join(filepath.Dir(rf), rp)
-		}
-
-		if src.Commands[i].Commands, err = m.source(rp); err != nil {
-			return nil, err
-		}
-
-		if v.Proxy != nil {
-			for _, y := range v.Proxy {
-				src.Commands[i].Commands = append(src.Commands[i].Commands, domain.Cmd{
-					Name:    y,
-					Short:   v.Name + " " + y + " proxy",
-					Type:    "proxy",
-					Workdir: filepath.Dir(rp),
-				})
+		if v.Ref != "" {
+			rp := v.Ref
+			if !filepath.IsAbs(v.Ref) {
+				rp = filepath.Join(filepath.Dir(rf), rp)
+			}
+			if src.Commands[i].Commands, err = m.source(rp); err != nil {
+				return nil, err
+			}
+			if v.Proxy != nil {
+				for _, y := range v.Proxy {
+					src.Commands[i].Commands = append(src.Commands[i].Commands, domain.Cmd{
+						Name:    y,
+						Short:   v.Name + " " + y + " proxy",
+						Type:    "proxy",
+						Workdir: filepath.Dir(rp),
+					})
+				}
+			}
+		} else if len(src.Commands[i].Commands) > 0 {
+			if src.Commands[i].Commands, err = m.link(src.Commands[i].Commands, rf, rf); err != nil {
+				return nil, err
 			}
 		}
 	}
 	return src.Commands, nil
+}
+
+// vinculo entre repositorio e base
+func (m YmlCommandRepository) link(cmds []domain.Cmd, wd string, rf string) ([]domain.Cmd, error) {
+	var err error
+	for i, v := range cmds {
+		if v.Ref != "" {
+			rp := v.Ref
+			if !filepath.IsAbs(v.Ref) {
+				rp = filepath.Join(filepath.Dir(wd), rp)
+			}
+
+			if cmds[i].Commands, err = m.source(rp); err != nil {
+				return nil, err
+			}
+		} else {
+			cmds[i].SetFileDir(filepath.Dir(rf))
+		}
+	}
+	return cmds, nil
 }

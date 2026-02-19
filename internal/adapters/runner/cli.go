@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -98,32 +97,16 @@ func (c *Cli) Run(cmd *domain.Cmd, dryRun bool) error {
 }
 
 func (c *Cli) proxy(cmd *domain.Cmd) error {
-	if cmd.Name != "git" {
-		return fmt.Errorf("proxy only supports git")
-	}
-	act := []string{"-C", cmd.Workdir}
+	var act []string
 	for _, x := range cmd.Args {
 		act = append(act, x.Value)
 	}
 	return c.runE(CliRunOpts{
-		Command:   "git",
+		Command:   cmd.Name,
 		Attach:    true,
 		Arguments: act,
+		Workdir:   cmd.Workdir,
 	})
-}
-
-func (c *Cli) runB(opts CliRunOpts) ([]byte, error) {
-	cmd := exec.Command(opts.Command, opts.Arguments...)
-	cmd.Dir = opts.Workdir
-	cmd.Env = opts.Env
-	var outb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = os.Stderr
-	if c.Logger != nil {
-		c.Logger.Debug(fmt.Sprintf("%s\n", cmd.String()))
-	}
-	err := cmd.Run()
-	return outb.Bytes(), err
 }
 
 func (c *Cli) runE(opts CliRunOpts) error {

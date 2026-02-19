@@ -19,6 +19,7 @@ type Cmd struct {
 	Proxy    []string `yaml:"proxy"`
 	Matrix   *Matrix  `yaml:"matrix"`
 	Workdir  string
+	Filedir  string
 	Type     string
 }
 
@@ -121,4 +122,12 @@ func (c *Cmd) SetWd(wd string) {
 
 func (c *Cmd) GetWd() string {
 	return c.Workdir
+}
+
+func (c *Cmd) SetFileDir(rd string) {
+	c.Filedir = rd
+}
+
+func (c *Cmd) GetFileDir() string {
+	return c.Filedir
 }
