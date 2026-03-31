@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -44,7 +45,7 @@ func (m *multi) runParallel(command string, pll int, log domain.LogType) {
 		go func(l domain.LogType) {
 			defer wg.Done()
 			ch <- struct{}{}
-			if status, err := m.runCmd(command, nil, l); err != nil {
+			if status, _, _, err := m.runCmd(command, nil, l); err != nil {
 				fmt.Println(fmt.Errorf("Err: (status: %d) %w", status, err))
 			}
 			<-ch
@@ -67,27 +68,34 @@ func (m *multi) runParallelWithFlags(command string, pll int, mFlags []map[strin
 			defer wg.Done()
 			ch <- struct{}{}
 
-			c, err := m.runCmd(command, flags, l)
+			c, outa, oute, err := m.runCmd(command, flags, l)
 			if err != nil {
 				fmt.Println(fmt.Errorf("Err: (status: %d) %w", c, err))
 			}
-
-			if l == domain.LogTool {
+			if l == domain.LogTool || l == domain.LogEmbed {
 				current := atomic.AddInt64(&counter, 1)
+				if l == domain.LogEmbed {
+					if outa != nil && len(string(outa)) > 0 {
+						flags["outa"] = string(outa)
+					}
+					if oute != nil && len(string(oute)) > 0 {
+						flags["outb"] = string(oute)
+					}
+				}
+				flags["_id"] = fmt.Sprintf("Script: %d of %d (status: %d)", current, len(mFlags), c)
 				if fgs, _ := json.Marshal(flags); fgs != nil {
-					fmt.Printf("Script: %d of %d (status: %d) - %s\n", current, len(mFlags), c, string(fgs))
+					fmt.Println(string(fgs))
 				} else {
-					fmt.Printf("Script: %d of %d (status: %d)\n", current, len(mFlags), c)
+					fmt.Printf("Script: %d of %d (status: %d) - error json flags encoding\n", current, len(mFlags), c)
 				}
 			}
-
 			<-ch
 		}(v, i, log)
 	}
 	wg.Wait()
 }
 
-func (m *multi) runCmd(command string, flags map[string]string, log domain.LogType) (int, error) {
+func (m *multi) runCmd(command string, flags map[string]string, log domain.LogType) (int, []byte, []byte, error) {
 	act := strings.Split(command, " ")
 	if len(flags) > 0 {
 		for k, v := range flags {
@@ -100,16 +108,25 @@ func (m *multi) runCmd(command string, flags map[string]string, log domain.LogTy
 	} else {
 		cmd = exec.Command(act[:1][0], act[1:]...)
 	}
-	if log == domain.LogScript {
+	var outb bytes.Buffer
+	var oute bytes.Buffer
+	switch log {
+	case domain.LogScript:
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+	case domain.LogEmbed:
+		cmd.Stdout = &outb
+		cmd.Stderr = &oute
 	}
 	cmd.Stdin = os.Stdin
 	if err := cmd.Run(); err != nil {
 		if e, ok := err.(*exec.ExitError); ok {
-			return e.ExitCode(), err
+			return e.ExitCode(), nil, nil, err
 		}
-		return 1, err
+		return 1, nil, nil, err
 	}
-	return 0, nil
+	if log == domain.LogEmbed {
+		return 0, outb.Bytes(), oute.Bytes(), nil
+	}
+	return 0, nil, nil, nil
 }
